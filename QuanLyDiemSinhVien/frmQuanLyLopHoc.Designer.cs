@@ -53,7 +53,7 @@
             this.cbMonHoc = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtSiSo = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -66,6 +66,7 @@
             this.btnThoat.TabIndex = 26;
             this.btnThoat.Text = "Thoát";
             this.btnThoat.UseVisualStyleBackColor = true;
+            this.btnThoat.Click += new System.EventHandler(this.btnThoat_Click);
             // 
             // btnHuy
             // 
@@ -75,6 +76,7 @@
             this.btnHuy.TabIndex = 31;
             this.btnHuy.Text = "Hủy";
             this.btnHuy.UseVisualStyleBackColor = true;
+            this.btnHuy.Click += new System.EventHandler(this.btnHuy_Click);
             // 
             // btnSua
             // 
@@ -84,6 +86,7 @@
             this.btnSua.TabIndex = 27;
             this.btnSua.Text = "Sửa";
             this.btnSua.UseVisualStyleBackColor = true;
+            this.btnSua.Click += new System.EventHandler(this.btnSua_Click);
             // 
             // btnLuu
             // 
@@ -93,6 +96,7 @@
             this.btnLuu.TabIndex = 28;
             this.btnLuu.Text = "Lưu";
             this.btnLuu.UseVisualStyleBackColor = true;
+            this.btnLuu.Click += new System.EventHandler(this.btnLuu_Click);
             // 
             // btnThem
             // 
@@ -102,6 +106,7 @@
             this.btnThem.TabIndex = 29;
             this.btnThem.Text = "Thêm";
             this.btnThem.UseVisualStyleBackColor = true;
+            this.btnThem.Click += new System.EventHandler(this.btnThem_Click);
             // 
             // btnXoa
             // 
@@ -111,6 +116,7 @@
             this.btnXoa.TabIndex = 30;
             this.btnXoa.Text = "Xóa";
             this.btnXoa.UseVisualStyleBackColor = true;
+            this.btnXoa.Click += new System.EventHandler(this.btnXoa_Click);
             // 
             // btnTim
             // 
@@ -124,38 +130,38 @@
             // sinhViênToolStripMenuItem
             // 
             this.sinhViênToolStripMenuItem.Name = "sinhViênToolStripMenuItem";
-            this.sinhViênToolStripMenuItem.Size = new System.Drawing.Size(67, 20);
+            this.sinhViênToolStripMenuItem.Size = new System.Drawing.Size(82, 24);
             this.sinhViênToolStripMenuItem.Text = "Sinh viên";
             // 
             // mônHọcToolStripMenuItem
             // 
             this.mônHọcToolStripMenuItem.Name = "mônHọcToolStripMenuItem";
-            this.mônHọcToolStripMenuItem.Size = new System.Drawing.Size(67, 20);
+            this.mônHọcToolStripMenuItem.Size = new System.Drawing.Size(81, 24);
             this.mônHọcToolStripMenuItem.Text = "Môn học";
             // 
             // txtTim
             // 
             this.txtTim.Location = new System.Drawing.Point(111, 54);
             this.txtTim.Name = "txtTim";
-            this.txtTim.Size = new System.Drawing.Size(292, 26);
+            this.txtTim.Size = new System.Drawing.Size(292, 30);
             this.txtTim.TabIndex = 19;
             // 
             // nhậpĐiểmToolStripMenuItem
             // 
             this.nhậpĐiểmToolStripMenuItem.Name = "nhậpĐiểmToolStripMenuItem";
-            this.nhậpĐiểmToolStripMenuItem.Size = new System.Drawing.Size(78, 20);
+            this.nhậpĐiểmToolStripMenuItem.Size = new System.Drawing.Size(97, 24);
             this.nhậpĐiểmToolStripMenuItem.Text = "Nhập điểm";
             // 
             // traCứuToolStripMenuItem
             // 
             this.traCứuToolStripMenuItem.Name = "traCứuToolStripMenuItem";
-            this.traCứuToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
+            this.traCứuToolStripMenuItem.Size = new System.Drawing.Size(71, 24);
             this.traCứuToolStripMenuItem.Text = "Tra cứu";
             // 
             // thoátToolStripMenuItem
             // 
             this.thoátToolStripMenuItem.Name = "thoátToolStripMenuItem";
-            this.thoátToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
+            this.thoátToolStripMenuItem.Size = new System.Drawing.Size(61, 24);
             this.thoátToolStripMenuItem.Text = "Thoát";
             // 
             // label1
@@ -163,18 +169,19 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(20, 61);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(65, 19);
+            this.label1.Size = new System.Drawing.Size(85, 22);
             this.label1.TabIndex = 14;
             this.label1.Text = "Tìm kiếm";
             // 
             // lớpHọcToolStripMenuItem
             // 
             this.lớpHọcToolStripMenuItem.Name = "lớpHọcToolStripMenuItem";
-            this.lớpHọcToolStripMenuItem.Size = new System.Drawing.Size(62, 20);
+            this.lớpHọcToolStripMenuItem.Size = new System.Drawing.Size(76, 24);
             this.lớpHọcToolStripMenuItem.Text = "Lớp học";
             // 
             // menuStrip1
             // 
+            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.sinhViênToolStripMenuItem,
             this.mônHọcToolStripMenuItem,
@@ -184,7 +191,7 @@
             this.thoátToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1200, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1200, 28);
             this.menuStrip1.TabIndex = 7;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -197,6 +204,7 @@
             this.SiSo});
             this.dataGridView1.Location = new System.Drawing.Point(21, 116);
             this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.Size = new System.Drawing.Size(1004, 150);
             this.dataGridView1.TabIndex = 32;
@@ -204,25 +212,30 @@
             // Lop
             // 
             this.Lop.HeaderText = "Lớp";
+            this.Lop.MinimumWidth = 6;
             this.Lop.Name = "Lop";
             this.Lop.Width = 80;
             // 
             // TenMon
             // 
             this.TenMon.HeaderText = "Tên Môn";
+            this.TenMon.MinimumWidth = 6;
             this.TenMon.Name = "TenMon";
+            this.TenMon.Width = 125;
             // 
             // SiSo
             // 
             this.SiSo.HeaderText = "Sĩ Số";
+            this.SiSo.MinimumWidth = 6;
             this.SiSo.Name = "SiSo";
+            this.SiSo.Width = 125;
             // 
             // cbLop
             // 
             this.cbLop.FormattingEnabled = true;
             this.cbLop.Location = new System.Drawing.Point(111, 301);
             this.cbLop.Name = "cbLop";
-            this.cbLop.Size = new System.Drawing.Size(190, 27);
+            this.cbLop.Size = new System.Drawing.Size(190, 30);
             this.cbLop.TabIndex = 34;
             // 
             // label6
@@ -230,7 +243,7 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(20, 301);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(34, 19);
+            this.label6.Size = new System.Drawing.Size(42, 22);
             this.label6.TabIndex = 33;
             this.label6.Text = "Lớp";
             // 
@@ -239,7 +252,7 @@
             this.cbMonHoc.FormattingEnabled = true;
             this.cbMonHoc.Location = new System.Drawing.Point(477, 302);
             this.cbMonHoc.Name = "cbMonHoc";
-            this.cbMonHoc.Size = new System.Drawing.Size(190, 27);
+            this.cbMonHoc.Size = new System.Drawing.Size(190, 30);
             this.cbMonHoc.TabIndex = 36;
             // 
             // label7
@@ -247,7 +260,7 @@
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(386, 304);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(64, 19);
+            this.label7.Size = new System.Drawing.Size(79, 22);
             this.label7.TabIndex = 35;
             this.label7.Text = "Môn học";
             // 
@@ -256,23 +269,23 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(752, 304);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(42, 19);
+            this.label2.Size = new System.Drawing.Size(53, 22);
             this.label2.TabIndex = 35;
             this.label2.Text = "Sĩ Số";
             // 
-            // textBox1
+            // txtSiSo
             // 
-            this.textBox1.Location = new System.Drawing.Point(822, 302);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(203, 26);
-            this.textBox1.TabIndex = 37;
+            this.txtSiSo.Location = new System.Drawing.Point(822, 302);
+            this.txtSiSo.Name = "txtSiSo";
+            this.txtSiSo.Size = new System.Drawing.Size(203, 30);
+            this.txtSiSo.TabIndex = 37;
             // 
             // frmQuanLyLopHoc
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 22F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1200, 658);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.txtSiSo);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.cbMonHoc);
             this.Controls.Add(this.label7);
@@ -290,9 +303,10 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.menuStrip1);
             this.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmQuanLyLopHoc";
             this.Text = "frmQuanLyLopHoc";
+            this.Load += new System.EventHandler(this.frmQuanLyLopHoc_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
@@ -327,6 +341,6 @@
         private System.Windows.Forms.ComboBox cbMonHoc;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtSiSo;
     }
 }
