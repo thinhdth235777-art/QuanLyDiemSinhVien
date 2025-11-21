@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -46,52 +46,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="frmNhapDiem.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmNhapDiem.Designer.cs">
-      <DependentUpon>frmNhapDiem.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmQuanLyLopHoc.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmQuanLyLopHoc.Designer.cs">
-      <DependentUpon>frmQuanLyLopHoc.cs</DependentUpon>
-    </Compile>
     <Compile Include="frmQuanLySinhVien.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmQuanLySinhVien.Designer.cs">
       <DependentUpon>frmQuanLySinhVien.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmQuanLyMonHoc.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmQuanLyMonHoc.Designer.cs">
-      <DependentUpon>frmQuanLyMonHoc.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmTraCuu.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmTraCuu.Designer.cs">
-      <DependentUpon>frmTraCuu.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="frmNhapDiem.resx">
-      <DependentUpon>frmNhapDiem.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmQuanLyLopHoc.resx">
-      <DependentUpon>frmQuanLyLopHoc.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmQuanLySinhVien.resx">
       <DependentUpon>frmQuanLySinhVien.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmQuanLyMonHoc.resx">
-      <DependentUpon>frmQuanLyMonHoc.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmTraCuu.resx">
-      <DependentUpon>frmTraCuu.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
