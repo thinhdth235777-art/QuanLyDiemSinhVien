@@ -316,6 +316,7 @@
             this.btnThoat.TabIndex = 24;
             this.btnThoat.Text = "Thoát";
             this.btnThoat.UseVisualStyleBackColor = true;
+            this.btnThoat.Click += new System.EventHandler(this.btnThoat_Click);
             // 
             // btnSua
             // 
@@ -325,6 +326,7 @@
             this.btnSua.TabIndex = 25;
             this.btnSua.Text = "Sửa";
             this.btnSua.UseVisualStyleBackColor = true;
+            this.btnSua.Click += new System.EventHandler(this.btnSua_Click);
             // 
             // btnThem
             // 
@@ -334,6 +336,7 @@
             this.btnThem.TabIndex = 26;
             this.btnThem.Text = "Thêm";
             this.btnThem.UseVisualStyleBackColor = true;
+            this.btnThem.Click += new System.EventHandler(this.btnThem_Click);
             // 
             // btnHuy
             // 
@@ -343,6 +346,7 @@
             this.btnHuy.TabIndex = 30;
             this.btnHuy.Text = "Hủy";
             this.btnHuy.UseVisualStyleBackColor = true;
+            this.btnHuy.Click += new System.EventHandler(this.btnHuy_Click);
             // 
             // cbMonHoc
             // 
@@ -376,6 +380,7 @@
             this.btnLuu.TabIndex = 29;
             this.btnLuu.Text = "Lưu";
             this.btnLuu.UseVisualStyleBackColor = true;
+            this.btnLuu.Click += new System.EventHandler(this.btnLuu_Click);
             // 
             // btnXoa
             // 
@@ -385,6 +390,7 @@
             this.btnXoa.TabIndex = 28;
             this.btnXoa.Text = "Xóa";
             this.btnXoa.UseVisualStyleBackColor = true;
+            this.btnXoa.Click += new System.EventHandler(this.btnXoa_Click);
             // 
             // btnTim
             // 
@@ -394,6 +400,7 @@
             this.btnTim.TabIndex = 27;
             this.btnTim.Text = "Tìm";
             this.btnTim.UseVisualStyleBackColor = true;
+            this.btnTim.Click += new System.EventHandler(this.btnTim_Click);
             // 
             // txtDiemGK
             // 
@@ -627,6 +634,7 @@
             this.btnThoat1.TabIndex = 42;
             this.btnThoat1.Text = "Thoát";
             this.btnThoat1.UseVisualStyleBackColor = true;
+            this.btnThoat1.Click += new System.EventHandler(this.btnThoat1_Click);
             // 
             // btnHuy1
             // 
@@ -636,6 +644,7 @@
             this.btnHuy1.TabIndex = 39;
             this.btnHuy1.Text = "Hủy";
             this.btnHuy1.UseVisualStyleBackColor = true;
+            this.btnHuy1.Click += new System.EventHandler(this.btnHuy1_Click);
             // 
             // btnSua1
             // 
@@ -645,6 +654,7 @@
             this.btnSua1.TabIndex = 45;
             this.btnSua1.Text = "Sửa";
             this.btnSua1.UseVisualStyleBackColor = true;
+            this.btnSua1.Click += new System.EventHandler(this.btnSua1_Click);
             // 
             // btnThem1
             // 
@@ -654,6 +664,7 @@
             this.btnThem1.TabIndex = 43;
             this.btnThem1.Text = "Thêm";
             this.btnThem1.UseVisualStyleBackColor = true;
+            this.btnThem1.Click += new System.EventHandler(this.btnThem1_Click);
             // 
             // btnLuu1
             // 
@@ -663,6 +674,7 @@
             this.btnLuu1.TabIndex = 44;
             this.btnLuu1.Text = "Lưu";
             this.btnLuu1.UseVisualStyleBackColor = true;
+            this.btnLuu1.Click += new System.EventHandler(this.btnLuu1_Click);
             // 
             // btnXoa1
             // 
@@ -672,6 +684,7 @@
             this.btnXoa1.TabIndex = 40;
             this.btnXoa1.Text = "Xóa";
             this.btnXoa1.UseVisualStyleBackColor = true;
+            this.btnXoa1.Click += new System.EventHandler(this.btnXoa1_Click);
             // 
             // label11
             // 
@@ -724,6 +737,7 @@
             this.btnTim1.TabIndex = 41;
             this.btnTim1.Text = "Tìm";
             this.btnTim1.UseVisualStyleBackColor = true;
+            this.btnTim1.Click += new System.EventHandler(this.btnTim1_Click);
             // 
             // tabLopHoc
             // 
@@ -844,6 +858,7 @@
             this.btnThoat2.TabIndex = 41;
             this.btnThoat2.Text = "Thoát";
             this.btnThoat2.UseVisualStyleBackColor = true;
+            this.btnThoat2.Click += new System.EventHandler(this.btnThoat2_Click);
             // 
             // btnHuy2
             // 
@@ -853,6 +868,7 @@
             this.btnHuy2.TabIndex = 46;
             this.btnHuy2.Text = "Hủy";
             this.btnHuy2.UseVisualStyleBackColor = true;
+            this.btnHuy2.Click += new System.EventHandler(this.btnHuy2_Click);
             // 
             // btnSua2
             // 
@@ -862,6 +878,7 @@
             this.btnSua2.TabIndex = 42;
             this.btnSua2.Text = "Sửa";
             this.btnSua2.UseVisualStyleBackColor = true;
+            this.btnSua2.Click += new System.EventHandler(this.btnSua2_Click);
             // 
             // btnLuu2
             // 
@@ -871,6 +888,7 @@
             this.btnLuu2.TabIndex = 43;
             this.btnLuu2.Text = "Lưu";
             this.btnLuu2.UseVisualStyleBackColor = true;
+            this.btnLuu2.Click += new System.EventHandler(this.btnLuu2_Click);
             // 
             // btnThem2
             // 
@@ -880,6 +898,7 @@
             this.btnThem2.TabIndex = 44;
             this.btnThem2.Text = "Thêm";
             this.btnThem2.UseVisualStyleBackColor = true;
+            this.btnThem2.Click += new System.EventHandler(this.btnThem2_Click);
             // 
             // btnXoa2
             // 
@@ -889,6 +908,7 @@
             this.btnXoa2.TabIndex = 45;
             this.btnXoa2.Text = "Xóa";
             this.btnXoa2.UseVisualStyleBackColor = true;
+            this.btnXoa2.Click += new System.EventHandler(this.btnXoa2_Click);
             // 
             // btnTim2
             // 
@@ -898,6 +918,7 @@
             this.btnTim2.TabIndex = 40;
             this.btnTim2.Text = "Tìm";
             this.btnTim2.UseVisualStyleBackColor = true;
+            this.btnTim2.Click += new System.EventHandler(this.btnTim2_Click);
             // 
             // txtTim2
             // 
@@ -985,6 +1006,7 @@
             this.btnSua3.TabIndex = 59;
             this.btnSua3.Text = "Sửa";
             this.btnSua3.UseVisualStyleBackColor = true;
+            this.btnSua3.Click += new System.EventHandler(this.btnSua3_Click);
             // 
             // dgvNhapDiem
             // 
@@ -1077,6 +1099,7 @@
             this.btnThoat3.TabIndex = 57;
             this.btnThoat3.Text = "Thoát";
             this.btnThoat3.UseVisualStyleBackColor = true;
+            this.btnThoat3.Click += new System.EventHandler(this.btnThoat3_Click);
             // 
             // btnHuy3
             // 
@@ -1086,6 +1109,7 @@
             this.btnHuy3.TabIndex = 56;
             this.btnHuy3.Text = "Hủy";
             this.btnHuy3.UseVisualStyleBackColor = true;
+            this.btnHuy3.Click += new System.EventHandler(this.btnHuy3_Click);
             // 
             // btnThem3
             // 
@@ -1095,6 +1119,7 @@
             this.btnThem3.TabIndex = 55;
             this.btnThem3.Text = "Thêm";
             this.btnThem3.UseVisualStyleBackColor = true;
+            this.btnThem3.Click += new System.EventHandler(this.btnThem3_Click);
             // 
             // btnLuu3
             // 
@@ -1104,6 +1129,7 @@
             this.btnLuu3.TabIndex = 54;
             this.btnLuu3.Text = "Lưu";
             this.btnLuu3.UseVisualStyleBackColor = true;
+            this.btnLuu3.Click += new System.EventHandler(this.btnLuu3_Click);
             // 
             // btnXoa3
             // 
@@ -1113,6 +1139,7 @@
             this.btnXoa3.TabIndex = 53;
             this.btnXoa3.Text = "Xóa";
             this.btnXoa3.UseVisualStyleBackColor = true;
+            this.btnXoa3.Click += new System.EventHandler(this.btnXoa3_Click);
             // 
             // btnTim3
             // 
@@ -1122,6 +1149,7 @@
             this.btnTim3.TabIndex = 58;
             this.btnTim3.Text = "Tìm";
             this.btnTim3.UseVisualStyleBackColor = true;
+            this.btnTim3.Click += new System.EventHandler(this.btnTim3_Click);
             // 
             // txtDiemGK1
             // 
@@ -1368,6 +1396,7 @@
             this.btnTim4.TabIndex = 36;
             this.btnTim4.Text = "Tìm";
             this.btnTim4.UseVisualStyleBackColor = true;
+            this.btnTim4.Click += new System.EventHandler(this.btnTim4_Click);
             // 
             // txtTim4
             // 
