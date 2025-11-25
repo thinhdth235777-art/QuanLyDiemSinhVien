@@ -15,15 +15,17 @@ namespace QuanLyDiemSinhVien
 {
     public partial class frmQuanLySinhVien : Form
     {
-        public frmQuanLySinhVien()
-        {
-            InitializeComponent();
-        }
+        SqlConnection conn = new SqlConnection(
+        @"Data Source=.;Initial Catalog=QuanlyDSV;Integrated Security=True");
         DataSet ds = new DataSet("dsQLNV");
         SqlDataAdapter daLop;
         SqlDataAdapter daMon;
         SqlDataAdapter daDSLop;
         //....
+        public frmQuanLySinhVien()
+        {
+            InitializeComponent();
+        }
         private void frmQuanLySinhVien_Load(object sender, EventArgs e)
         {
             //=========================Xử lý load Sinh Viên=========================================
@@ -31,49 +33,16 @@ namespace QuanLyDiemSinhVien
             //=========================Xử lý load Môn Học===========================================
             //...
             //=========================Xử lý load Lớp Học===========================================
-            SqlConnection conn = new SqlConnection();
-            conn.ConnectionString = @"Data Source=.;Initial Catalog=QuanlyDSV;Integrated Security=True";
-            // ==== Load bảng Lớp ====
-            string sqlLop = "SELECT * FROM Lop";
-            daLop = new SqlDataAdapter(sqlLop, conn);
-            daLop.Fill(ds, "tblLop");
-
-            cbLop1.DataSource = ds.Tables["tblLop"];
-            cbLop1.DisplayMember = "TenLop";
-            cbLop1.ValueMember = "MaLop";
-
-            // ==== Load bảng Môn học ====
-            string sqlMon = "SELECT * FROM MonHoc";
-            daMon = new SqlDataAdapter(sqlMon, conn);
-            daMon.Fill(ds, "tblMon");
-
-            cbMonHoc2.DataSource = ds.Tables["tblMon"];
-            cbMonHoc2.DisplayMember = "TenMon";
-            cbMonHoc2.ValueMember = "MaMon";
-
-            // ==== Load danh sách lớp học (grid) ====
-            string sqlDSLop = @"SELECT l.MaLop, l.TenLop, m.TenMon, 0 AS SiSo
-                        FROM Lop l
-                        CROSS JOIN MonHoc m";
-
-            daDSLop = new SqlDataAdapter(sqlDSLop, conn);
-            daDSLop.Fill(ds, "tblDSLop");
-
-            dgvLopHoc.AutoGenerateColumns = true;
-
-            dgvLopHoc.DataSource = ds.Tables["tblDSLop"]; 
-
-            dgvLopHoc.Columns["MaLop"].HeaderText = "Lớp";
-            dgvLopHoc.Columns["TenLop"].HeaderText = "Tên Lớp";
-            dgvLopHoc.Columns["TenMon"].HeaderText = "Môn Học";
-            dgvLopHoc.Columns["SiSo"].HeaderText = "Sĩ Số";
-
-            dgvLopHoc.AllowUserToAddRows = false;
-
-
+            LoadComboLop();
+            LoadComboMon();
+            LoadDanhSachLop();
             KhoaLopHoc(true);
             //=========================Xử lý load Nhập Điểm=========================================
-            //...
+            LoadComboLop_NhapDiem();
+            LoadComboMon_NhapDiem();
+            LoadNhapDiem();
+            LoadBangDiem();
+            KhoaNhapDiem(true);
         }
 
         //==========================================Sinh Viên================================================
@@ -176,6 +145,40 @@ namespace QuanLyDiemSinhVien
             btnThem2.Enabled = daKhoa;
             btnSua2.Enabled = daKhoa;
             btnXoa2.Enabled = daKhoa;
+        }
+        private void LoadComboLop()
+        {
+            string sql = "SELECT * FROM Lop";
+            daLop = new SqlDataAdapter(sql, conn);
+            daLop.Fill(ds, "tblLop");
+
+            cbLop1.DataSource = ds.Tables["tblLop"];
+            cbLop1.DisplayMember = "TenLop";
+            cbLop1.ValueMember = "MaLop";
+        }
+        private void LoadComboMon()
+        {
+            string sql = "SELECT * FROM MonHoc";
+            daMon = new SqlDataAdapter(sql, conn);
+            daMon.Fill(ds, "tblMon");
+
+            cbMonHoc2.DataSource = ds.Tables["tblMon"];
+            cbMonHoc2.DisplayMember = "TenMon";
+            cbMonHoc2.ValueMember = "MaMon";
+        }
+        private void LoadDanhSachLop()
+        {
+            string sql = @"SELECT l.MaLop, l.TenLop, m.TenMon, 0 AS SiSo
+                   FROM Lop l CROSS JOIN MonHoc m";
+
+            daDSLop = new SqlDataAdapter(sql, conn);
+            daDSLop.Fill(ds, "tblDSLop");
+
+            dgvLopHoc.DataSource = ds.Tables["tblDSLop"];
+            dgvLopHoc.Columns["MaLop"].HeaderText = "Mã Lớp";
+            dgvLopHoc.Columns["TenLop"].HeaderText = "Tên Lớp";
+            dgvLopHoc.Columns["TenMon"].HeaderText = "Môn Học";
+            dgvLopHoc.Columns["SiSo"].HeaderText = "Sĩ Số";
         }
         private void btnThem2_Click(object sender, EventArgs e)
         {
@@ -296,30 +299,331 @@ namespace QuanLyDiemSinhVien
         }
         //===========================================Nhập Điểm=================================================
         //CHỖ VIẾT THÊM HÀM MỚI CỦA NHẬP ĐIỂM:
-        //..................................
+        bool dangThemDiem = false;
+        SqlDataAdapter daDiem;
+
+        private void LoadComboLop_NhapDiem()
+        {
+            string sql = "SELECT MaLop, TenLop FROM Lop";
+            SqlDataAdapter da = new SqlDataAdapter(sql, conn);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+
+            cbLop2.DataSource = dt;
+            cbLop2.DisplayMember = "TenLop"; 
+            cbLop2.ValueMember = "MaLop"; 
+            cbLop2.SelectedIndex = -1;
+        }
+
+
+        private void LoadComboMon_NhapDiem()
+        {
+            string sql = "SELECT MaMon, TenMon FROM MonHoc";
+            SqlDataAdapter da = new SqlDataAdapter(sql, conn);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+
+            cbMaMon2.DataSource = dt;
+            cbMaMon2.DisplayMember = "MaMon";
+            cbMaMon2.ValueMember = "MaMon";
+
+            cbMonHoc3.DataSource = dt.Copy();
+            cbMonHoc3.DisplayMember = "TenMon";
+            cbMonHoc3.ValueMember = "MaMon";
+
+            // đồng bộ hai combobox
+            cbMaMon2.SelectedIndexChanged += (s, e) => {
+                if (cbMaMon2.SelectedValue != null)
+                    cbMonHoc3.SelectedValue = cbMaMon2.SelectedValue;
+            };
+            cbMonHoc3.SelectedIndexChanged += (s, e) => {
+                if (cbMonHoc3.SelectedValue != null)
+                    cbMaMon2.SelectedValue = cbMonHoc3.SelectedValue;
+            };
+        }
+        private void LoadNhapDiem()
+        {
+            daMon = new SqlDataAdapter("SELECT MaMon, TenMon FROM MonHoc", conn);
+
+            if (ds.Tables["tblMonHoc"] != null)
+                ds.Tables["tblMonHoc"].Clear();
+
+            daMon.Fill(ds, "tblMonHoc");
+
+            cbMaMon.DataSource = ds.Tables["tblMonHoc"];
+            cbMaMon.DisplayMember = "TenMon";
+            cbMaMon.ValueMember = "MaMon";
+
+
+            string sql = @"
+        SELECT d.MaSV, sv.HoTen, sv.MaLop, d.MaMon, mh.TenMon,
+               d.DiemGK, d.DiemCK,
+               ROUND((d.DiemGK + d.DiemCK * 2) / 3, 2) AS DiemTB
+        FROM Diem d
+        JOIN SinhVien sv ON d.MaSV = sv.MaSV
+        JOIN MonHoc mh ON d.MaMon = mh.MaMon";
+
+            daDSLop = new SqlDataAdapter(sql, conn);
+
+            if (ds.Tables["tblDiem"] != null)
+                ds.Tables["tblDiem"].Clear();
+
+            daDSLop.Fill(ds, "tblDiem");
+
+            dgvNhapDiem.DataSource = ds.Tables["tblDiem"];
+        }
+
+        private void LoadBangDiem()
+        {
+            string sql = @"SELECT d.MaSV, sv.HoTen, sv.MaLop, d.MaMon, m.TenMon,
+                          d.DiemGK, d.DiemCK, d.DiemTB
+                   FROM Diem d
+                   JOIN SinhVien sv ON d.MaSV = sv.MaSV
+                   JOIN MonHoc m ON d.MaMon = m.MaMon";
+
+            SqlDataAdapter da = new SqlDataAdapter(sql, conn);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            dt.Columns.Add("KetQua", typeof(string));
+
+            foreach (DataRow row in dt.Rows)
+            {
+                double tb = Convert.ToDouble(row["DiemTB"]);
+                row["KetQua"] = (tb >= 5) ? "Đậu" : "Rớt";
+            }
+
+
+            dgvNhapDiem.DataSource = dt;
+            dgvNhapDiem.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvNhapDiem.Columns["HoTen"].FillWeight = 200;
+            dgvNhapDiem.Columns["TenMon"].FillWeight = 150;
+            dgvNhapDiem.AllowUserToAddRows = false;
+
+            // đặt header tiếng Việt (nếu cột tồn tại)
+            if (dgvNhapDiem.Columns.Contains("MaSV")) dgvNhapDiem.Columns["MaSV"].HeaderText = "Mã SV";
+            if (dgvNhapDiem.Columns.Contains("HoTen")) dgvNhapDiem.Columns["HoTen"].HeaderText = "Họ Tên";
+            if (dgvNhapDiem.Columns.Contains("MaLop")) dgvNhapDiem.Columns["MaLop"].HeaderText = "Lớp";
+            if (dgvNhapDiem.Columns.Contains("MaMon")) dgvNhapDiem.Columns["MaMon"].HeaderText = "Mã Môn";
+            if (dgvNhapDiem.Columns.Contains("TenMon")) dgvNhapDiem.Columns["TenMon"].HeaderText = "Tên Môn";
+            if (dgvNhapDiem.Columns.Contains("DiemGK")) dgvNhapDiem.Columns["DiemGK"].HeaderText = "Giữa kỳ";
+            if (dgvNhapDiem.Columns.Contains("DiemCK")) dgvNhapDiem.Columns["DiemCK"].HeaderText = "Cuối kỳ";
+            if (dgvNhapDiem.Columns.Contains("DiemTB")) dgvNhapDiem.Columns["DiemTB"].HeaderText = "Trung bình";
+            if (dgvNhapDiem.Columns.Contains("KetQua")) dgvNhapDiem.Columns["KetQua"].HeaderText = "Kết quả";
+        }
+        private void cbLop2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbLop2.SelectedValue == null) return;
+            string malop = cbLop2.SelectedValue.ToString();
+
+            string sql = @"SELECT d.MaSV, sv.HoTen, sv.MaLop, d.MaMon, m.TenMon,
+                          d.DiemGK, d.DiemCK, d.DiemTB
+                   FROM Diem d
+                   JOIN SinhVien sv ON d.MaSV = sv.MaSV
+                   JOIN MonHoc m ON d.MaMon = m.MaMon
+                   WHERE sv.MaLop = @MaLop";
+
+            SqlDataAdapter da = new SqlDataAdapter(sql, conn);
+            da.SelectCommand.Parameters.AddWithValue("@MaLop", malop);
+
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+
+            dgvNhapDiem.DataSource = dt;
+        }
+        private void KhoaNhapDiem(bool daKhoa)
+        {
+            cbLop2.Enabled = !daKhoa;
+            cbMaMon2.Enabled = !daKhoa;
+            cbMonHoc3.Enabled = !daKhoa;
+
+            txtMaSV1.Enabled = !daKhoa;
+            txtHoTen1.Enabled = false;
+            txtDiemGK1.Enabled = !daKhoa;
+            txtDiemCK1.Enabled = !daKhoa;
+
+            btnLuu3.Enabled = !daKhoa;
+            btnHuy3.Enabled = !daKhoa;
+
+            btnThem3.Enabled = daKhoa;
+            btnSua3.Enabled = daKhoa;
+            btnXoa3.Enabled = daKhoa;
+        }
+        private void XoaNhapDiem()
+        {
+            txtMaSV1.Text = "";
+            txtHoTen1.Text = "";
+            txtDiemGK1.Text = "";
+            txtDiemCK1.Text = "";
+            txtDiemTB1.Text = "";
+            txtKetQua1.Text = "";
+        }
+        private void dgvNhapDiem_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            DataGridViewRow row = dgvNhapDiem.Rows[e.RowIndex];
+
+            txtMaSV1.Text = row.Cells["MaSV"].Value?.ToString() ?? "";
+            txtHoTen1.Text = row.Cells["HoTen"].Value?.ToString() ?? "";
+
+            string maMon = row.Cells["MaMon"].Value?.ToString() ?? "";
+            if (!string.IsNullOrEmpty(maMon))
+            {
+                cbMaMon2.SelectedValue = maMon;
+                cbMonHoc3.SelectedValue = maMon;
+            }
+
+            txtDiemGK1.Text = row.Cells["DiemGK"].Value?.ToString() ?? "";
+            txtDiemCK1.Text = row.Cells["DiemCK"].Value?.ToString() ?? "";
+            txtDiemTB1.Text = row.Cells["DiemTB"].Value?.ToString() ?? "";
+            txtKetQua1.Text = row.Cells["KetQua"].Value?.ToString() ?? "";
+        }
         private void btnThem3_Click(object sender, EventArgs e)
         {
-
+            dangThemDiem = true;
+            XoaNhapDiem();
+            KhoaNhapDiem(false);
+            LoadNhapDiem();
+            txtMaSV1.Focus();
         }
 
         private void btnSua3_Click(object sender, EventArgs e)
         {
+            if (dgvNhapDiem.CurrentRow == null)
+            {
+                MessageBox.Show("Vui lòng chọn dòng cần sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
+            dangThemDiem = false;
+
+            KhoaNhapDiem(false);
+
+            // Không cho sửa mã sinh viên và họ tên
+            txtMaSV1.Enabled = false;
+            txtHoTen1.Enabled = false;
+
+            // Cho sửa điểm và môn học
+            txtDiemGK1.Enabled = true;
+            txtDiemCK1.Enabled = true;
+            cbMaMon2.Enabled = true;
+            cbMonHoc3.Enabled = true;
+            LoadNhapDiem();
         }
 
         private void btnXoa3_Click(object sender, EventArgs e)
         {
+            string maSV = txtMaSV1.Text;
+            string maMon = cbMaMon2.Text;
 
+            DialogResult d = MessageBox.Show(
+                $"Bạn có chắc muốn xóa điểm?\n\nMã SV: {maSV}\nMã Môn: {maMon}",
+                "Xác nhận",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question
+            );
+
+            if (d == DialogResult.No) return;
+
+            string query = "DELETE FROM Diem WHERE MaSV = @maSV AND MaMon = @maMon";
+
+            try
+            {
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@maSV", maSV);
+                    cmd.Parameters.AddWithValue("@maMon", maMon);
+
+                    int kq = cmd.ExecuteNonQuery();
+
+                    if (kq > 0)
+                    {
+                        MessageBox.Show("Xóa điểm thành công!", "Thông báo",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        LoadBangDiem();
+                        XoaNhapDiem();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Không tìm thấy dữ liệu để xóa!", "Thông báo",
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message);
+            }
+            LoadNhapDiem();
         }
 
         private void btnLuu3_Click(object sender, EventArgs e)
         {
+            // ===== KIỂM TRA ĐẦU VÀO =====
+            if (cbLop2.SelectedIndex == -1 ||
+                string.IsNullOrWhiteSpace(txtMaSV1.Text) ||
+                cbMaMon2.SelectedIndex == -1)
+            {
+                MessageBox.Show("Vui lòng chọn đầy đủ Lớp - Sinh viên - Môn học!");
+                return;
+            }
 
+            // kiểm tra điểm nhập có hợp lệ không
+            if (!double.TryParse(txtDiemGK1.Text, out double gk) ||
+                !double.TryParse(txtDiemCK1.Text, out double ck))
+            {
+                MessageBox.Show("Điểm phải là số!");
+                return;
+            }
+
+            if (gk < 0 || gk > 10 || ck < 0 || ck > 10)
+            {
+                MessageBox.Show("Điểm phải nằm trong khoảng 0 - 10!");
+                return;
+            }
+
+            // ===== TÍNH ĐIỂM TB =====
+            double tb = Math.Round((gk + ck * 2) / 3, 2);
+            string ketQua = tb >= 5 ? "Đậu" : "Rớt";
+
+            if (dangThem)
+            {
+                // ===== THÊM MỚI =====
+                DataRow dong = ds.Tables["tblDiem"].NewRow();
+
+                dong["MaSV"] = txtMaSV1.Text;
+                dong["MaMon"] = cbMaMon2.SelectedValue;
+                dong["DiemGK"] = gk;
+                dong["DiemCK"] = ck;
+                dong["DiemTB"] = tb;
+                dong["KetQua"] = ketQua;
+
+                ds.Tables["tblDiem"].Rows.Add(dong);
+            }
+            else
+            {
+                // ===== SỬA =====
+                int r = dgvNhapDiem.CurrentCell.RowIndex;
+
+                ds.Tables["tblDiem"].Rows[r]["MaSV"] = txtMaSV1.Text;
+                ds.Tables["tblDiem"].Rows[r]["MaMon"] = cbMaMon2.SelectedValue;
+                ds.Tables["tblDiem"].Rows[r]["DiemGK"] = gk;
+                ds.Tables["tblDiem"].Rows[r]["DiemCK"] = ck;
+                ds.Tables["tblDiem"].Rows[r]["DiemTB"] = tb;
+                ds.Tables["tblDiem"].Rows[r]["KetQua"] = ketQua;
+            }
+
+            // ===== KHÓA LẠI GIAO DIỆN =====
+            KhoaNhapDiem(true);
+
+            // ===== LOAD LẠI BẢNG =====
+            LoadBangDiem();
         }
 
         private void btnHuy3_Click(object sender, EventArgs e)
         {
-
+            KhoaNhapDiem(true);
         }
 
         private void btnThoat3_Click(object sender, EventArgs e)
@@ -335,7 +639,10 @@ namespace QuanLyDiemSinhVien
         {
 
         }
-
+        private void btnCapNhat_Click(object sender, EventArgs e)
+        {
+            LoadNhapDiem();
+        }
         //============================================Tra Cứu================================================
         //CHỖ VIẾT THÊM HÀM MỚI CỦA TRA CỨU:
         //..................................
@@ -351,5 +658,7 @@ namespace QuanLyDiemSinhVien
                 KhoaLopHoc(true);
             }
         }
+
+        
     }
 }
