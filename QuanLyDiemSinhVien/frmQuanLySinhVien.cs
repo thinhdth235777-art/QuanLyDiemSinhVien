@@ -23,11 +23,13 @@ namespace QuanLyDiemSinhVien
         SqlDataAdapter daDSLop;
         SqlDataAdapter daSV;
         SqlCommandBuilder cmbSV;
-        SqlDataAdapter daDiem;
+        SqlCommandBuilder cbMonhoc1;
+        
 
         bool dangThemSV = false;
+        bool dangThemMH = false;
 
-
+        SqlDataAdapter daTraCuu;
         //....
         public frmQuanLySinhVien()
         {
@@ -37,17 +39,7 @@ namespace QuanLyDiemSinhVien
         {
             conn.ConnectionString = @"Data Source=.;Initial Catalog=QuanlyDSV;Integrated Security=True";
             //=========================Xử lý load Sinh Viên=========================================
-            string sqlSV = "SELECT MaSV, HoTen, NgaySinh, GioiTinh, MaLop FROM SinhVien";
-            daSV = new SqlDataAdapter(sqlSV, conn);
-            cmbSV = new SqlCommandBuilder(daSV);
-            try
-            {
-                daSV.Fill(ds, "tblSV"); // Tải dữ liệu SinhVien vào tblSV
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi tải dữ liệu Sinh Viên: " + ex.Message);
-            }
+            LoadSinhVien();
             //=========================Xử lý load Môn Học===========================================
             //...
             //=========================Xử lý load Lớp Học===========================================
@@ -85,6 +77,43 @@ namespace QuanLyDiemSinhVien
             btnSua.Enabled = daKhoa;
             btnXoa.Enabled = daKhoa;
             btnTim.Enabled = daKhoa;
+        }
+        private void LoadSinhVien()
+        {
+            string sqlSV = "SELECT MaSV, HoTen, NgaySinh, GioiTinh, MaLop FROM SinhVien";
+            daSV = new SqlDataAdapter(sqlSV, conn);
+            cmbSV = new SqlCommandBuilder(daSV);
+            try
+            {
+                if (ds.Tables.Contains("tblSV"))
+                    ds.Tables["tblSV"].Clear();
+                daSV.Fill(ds, "tblSV"); 
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi tải dữ liệu Sinh Viên: " + ex.Message);
+            }
+
+            dgvSinhVien.DataSource = ds.Tables["tblSV"];
+            dgvSinhVien.AutoGenerateColumns = true;
+
+            dgvSinhVien.Columns["MaSV"].HeaderText = "Mã SV";
+            dgvSinhVien.Columns["HoTen"].HeaderText = "Họ và Tên";
+            dgvSinhVien.Columns["NgaySinh"].HeaderText = "Ngày Sinh";
+            dgvSinhVien.Columns["GioiTinh"].HeaderText = "Giới Tính";
+            dgvSinhVien.Columns["MaLop"].HeaderText = "Mã Lớp";
+
+            dgvSinhVien.AllowUserToAddRows = false;
+
+            cbLop.DataSource = ds.Tables["tblLop"].Copy();
+            cbLop.DisplayMember = "TenLop";
+            cbLop.ValueMember = "MaLop";
+            cbLop.SelectedIndex = -1;
+
+            this.chkNam.CheckedChanged += new System.EventHandler(this.chkGioiTinh_CheckedChanged);
+            this.chkNu.CheckedChanged += new System.EventHandler(this.chkGioiTinh_CheckedChanged);
+
+            KhoaSV(true);
         }
         private void chkGioiTinh_CheckedChanged(object sender, EventArgs e)
         {
@@ -273,7 +302,54 @@ namespace QuanLyDiemSinhVien
 
         //=========================================Môn Học====================================================
         //CHỖ VIẾT THÊM HÀM MỚI CỦA MÔN HỌC:
-        //..................................
+        private void KhoaMonHoc(bool daKhoa)
+        {
+            
+            cbMaMon1.Enabled = !daKhoa || !dangThemMH;
+            cbMonHoc1.Enabled = !daKhoa;
+            cbSTC.Enabled = !daKhoa;
+
+           
+            btnLuu1.Enabled = !daKhoa;
+            btnHuy1.Enabled = !daKhoa;
+
+            btnThem1.Enabled = daKhoa;
+            btnSua1.Enabled = daKhoa;
+            btnXoa1.Enabled = daKhoa;
+            btnTim1.Enabled = daKhoa;
+        }
+        private void LoadMonHoc()
+        {
+            string sqlMon = "SELECT MaMon, TenMon, SoTinChi FROM MonHoc";
+            daMon = new SqlDataAdapter(sqlMon, conn);
+            cbMonHoc1 = new SqlCommandBuilder(daMon);
+            try
+            {
+                if (ds.Tables.Contains("tblMon"))
+                    ds.Tables["tblMon"].Clear();
+                daMon.Fill(ds, "tblMon"); 
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi tải dữ liệu Môn Học: " + ex.Message);
+            }
+
+            
+            dgvMonHoc.DataSource = ds.Tables["tblMon"];
+            dgvMonHoc.AutoGenerateColumns = true;
+
+           
+            dgvMonHoc.Columns["MaMon"].HeaderText = "Mã Môn";
+            dgvMonHoc.Columns["TenMon"].HeaderText = "Tên Môn";
+            dgvMonHoc.Columns["SoTinChi"].HeaderText = "Số Tín Chỉ";
+
+            dgvMonHoc.AllowUserToAddRows = false;
+
+            KhoaMonHoc(true);
+
+            
+        }
+
         private void btnThem1_Click(object sender, EventArgs e)
         {
 
@@ -534,9 +610,9 @@ namespace QuanLyDiemSinhVien
 
             daMon.Fill(ds, "tblMonHoc");
 
-            cbMaMon.DataSource = ds.Tables["tblMonHoc"];
-            cbMaMon.DisplayMember = "TenMon";
-            cbMaMon.ValueMember = "MaMon";
+            cbMaMon2.DataSource = ds.Tables["tblMonHoc"];
+            cbMaMon2.DisplayMember = "TenMon";
+            cbMaMon2.ValueMember = "MaMon";
 
 
             string sql = @"
@@ -829,7 +905,26 @@ namespace QuanLyDiemSinhVien
         }
         //============================================Tra Cứu================================================
         //CHỖ VIẾT THÊM HÀM MỚI CỦA TRA CỨU:
-        //..................................
+        private void LoadTraCuuData()
+        {
+            // Truy vấn JOIN 4 bảng: SinhVien, Lop, MonHoc, Diem (Bổ sung SoTinChi)
+            string sqlTraCuu = @"
+                SELECT 
+                    SV.MaSV, SV.HoTen, L.TenLop, SV.NgaySinh, SV.GioiTinh,
+                    MH.MaMon, MH.TenMon, MH.SoTinChi,
+                    D.DiemGK, D.DiemCK, D.DiemTB
+                FROM Diem D
+                JOIN SinhVien SV ON D.MaSV = SV.MaSV
+                JOIN MonHoc MH ON D.MaMon = MH.MaMon
+                JOIN Lop L ON SV.MaLop = L.MaLop";
+
+            if (ds.Tables.Contains("tblTraCuu"))
+                ds.Tables["tblTraCuu"].Clear();
+
+            daTraCuu = new SqlDataAdapter(sqlTraCuu, conn);
+            daTraCuu.Fill(ds, "tblTraCuu");
+        }
+
         private void btnTim4_Click(object sender, EventArgs e)
         {
 
