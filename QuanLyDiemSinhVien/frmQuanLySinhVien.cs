@@ -21,6 +21,13 @@ namespace QuanLyDiemSinhVien
         SqlDataAdapter daLop;
         SqlDataAdapter daMon;
         SqlDataAdapter daDSLop;
+        SqlDataAdapter daSV;
+        SqlCommandBuilder cmbSV;
+        SqlDataAdapter daDiem;
+
+        bool dangThemSV = false;
+
+
         //....
         public frmQuanLySinhVien()
         {
@@ -28,8 +35,19 @@ namespace QuanLyDiemSinhVien
         }
         private void frmQuanLySinhVien_Load(object sender, EventArgs e)
         {
+            conn.ConnectionString = @"Data Source=.;Initial Catalog=QuanlyDSV;Integrated Security=True";
             //=========================Xử lý load Sinh Viên=========================================
-            //...
+            string sqlSV = "SELECT MaSV, HoTen, NgaySinh, GioiTinh, MaLop FROM SinhVien";
+            daSV = new SqlDataAdapter(sqlSV, conn);
+            cmbSV = new SqlCommandBuilder(daSV);
+            try
+            {
+                daSV.Fill(ds, "tblSV"); // Tải dữ liệu SinhVien vào tblSV
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi tải dữ liệu Sinh Viên: " + ex.Message);
+            }
             //=========================Xử lý load Môn Học===========================================
             //...
             //=========================Xử lý load Lớp Học===========================================
@@ -47,30 +65,196 @@ namespace QuanLyDiemSinhVien
 
         //==========================================Sinh Viên================================================
         //CHỖ VIẾT THÊM HÀM MỚI CỦA SINH VIÊN:
-        //..................................
-        private void btnThem_Click(object sender, EventArgs e)
+        private void KhoaSV(bool daKhoa)
         {
 
+            txtMaSV.ReadOnly = daKhoa || !dangThemSV;
+            txtHoTen.Enabled = !daKhoa;
+
+            dtpNgaySinh.Enabled = !daKhoa;
+
+            chkNam.Enabled = !daKhoa;
+            chkNu.Enabled = !daKhoa;
+            cbLop.Enabled = !daKhoa;
+
+
+            btnLuu.Enabled = !daKhoa;
+            btnHuy.Enabled = !daKhoa;
+
+            btnThem.Enabled = daKhoa;
+            btnSua.Enabled = daKhoa;
+            btnXoa.Enabled = daKhoa;
+            btnTim.Enabled = daKhoa;
+        }
+        private void chkGioiTinh_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender is CheckBox chk)
+            {
+                if (chk.Checked)
+                {
+                    if (chk.Name == "chkNam")
+                    {
+                        chkNu.Checked = false;
+                    }
+                    else if (chk.Name == "chkNu")
+                    {
+                        chkNam.Checked = false;
+                    }
+                }
+            }
+        }
+
+        private void btnThem_Click(object sender, EventArgs e)
+        {
+            dangThemSV = true;
+
+            txtMaSV.Clear();
+            txtHoTen.Clear();
+
+            dtpNgaySinh.Value = DateTime.Now;
+
+
+            chkNam.Checked = true;
+            chkNu.Checked = false;
+
+            cbLop.SelectedIndex = -1;
+
+            KhoaSV(false);
+            txtMaSV.Focus();
         }
 
         private void btnSua_Click(object sender, EventArgs e)
         {
+            if (dgvSinhVien.CurrentRow == null)
+            {
+                MessageBox.Show("Vui lòng chọn dòng cần sửa!");
+                return;
+            }
 
+            dangThemSV = false;
+            KhoaSV(false);
+            txtMaSV.ReadOnly = true;
+            txtHoTen.Focus();
         }
 
         private void btnXoa_Click(object sender, EventArgs e)
         {
+            if (dgvSinhVien.CurrentRow == null)
+            {
+                MessageBox.Show("Vui lòng chọn dòng cần xóa!");
+                return;
+            }
 
+
+            string maSVCanXoa = dgvSinhVien.CurrentRow.Cells["MaSV"].Value.ToString();
+            if (ds.Tables.Contains("tblDiem"))
+            {
+                DataRow[] diemRows = ds.Tables["tblDiem"].Select($"MaSV = '{maSVCanXoa}'");
+                if (diemRows.Length > 0)
+                {
+                    MessageBox.Show("Không thể xóa sinh viên này vì đang có điểm số. Vui lòng xóa điểm trước!");
+                    return;
+                }
+            }
+            DialogResult traloi = MessageBox.Show(
+               "Bạn có chắc muốn xóa sinh viên này?",
+               "Xác nhận",
+               MessageBoxButtons.YesNo,
+               MessageBoxIcon.Question);
+
+            if (traloi == DialogResult.No) return;
+
+            try
+            {
+                int r = dgvSinhVien.CurrentCell.RowIndex;
+                DataRow dr = ds.Tables["tblSV"].Rows[r];
+                dr.Delete();
+
+                daSV.Update(ds, "tblSV");
+                LoadDiemData();
+                MessageBox.Show("Đã xóa thành công!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi xóa dữ liệu: " + ex.Message);
+                ds.Tables["tblSV"].RejectChanges();
+            }
         }
-
         private void btnLuu_Click(object sender, EventArgs e)
         {
+            if (txtMaSV.Text.Trim() == "" || txtHoTen.Text.Trim() == "" || cbLopSV.SelectedIndex == -1)
+            {
+                MessageBox.Show("Vui lòng nhập đầy đủ Mã SV, Họ Tên và chọn Lớp!");
+                return;
+            }
 
+            // Kiểm tra giới tính đã được chọn chưa
+            if (!chkNam.Checked && !chkNu.Checked)
+            {
+                MessageBox.Show("Vui lòng chọn Giới tính!");
+                return;
+            }
+
+            try
+            {
+
+                bool gioiTinhValue = chkNam.Checked;
+
+                if (dangThemSV)
+                {
+
+                    DataRow[] timSV = ds.Tables["tblSV"].Select($"MaSV = '{txtMaSV.Text.Trim()}'");
+                    if (timSV.Length > 0)
+                    {
+                        MessageBox.Show("Mã Sinh Viên đã tồn tại!");
+                        txtMaSV.Focus();
+                        return;
+                    }
+
+                    DataRow dong = ds.Tables["tblSV"].NewRow();
+
+                    dong["MaSV"] = txtMaSV.Text.Trim();
+                    dong["HoTen"] = txtHoTen.Text.Trim();
+                    dong["NgaySinh"] = dtpNgaySinh.Value;
+                    dong["GioiTinh"] = gioiTinhValue;
+                    dong["MaLop"] = cbLop.SelectedValue;
+
+                    ds.Tables["tblSV"].Rows.Add(dong);
+                }
+
+
+                else
+                {
+
+                    int r = dgvSinhVien.CurrentCell.RowIndex;
+
+
+                    DataRow dr = ds.Tables["tblSV"].Rows[r];
+
+                    dr["HoTen"] = txtHoTen.Text.Trim();
+                    dr["NgaySinh"] = dtpNgaySinh.Value;
+                    dr["GioiTinh"] = gioiTinhValue;
+                    dr["MaLop"] = cbLop.SelectedValue;
+                }
+
+                daSV.Update(ds, "tblSV");
+
+                KhoaSV(true); // 
+                MessageBox.Show("Đã lưu thành công!");
+            }
+
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi lưu dữ liệu: " + ex.Message);
+                ds.Tables["tblSV"].RejectChanges();
+            }
         }
 
         private void btnHuy_Click(object sender, EventArgs e)
         {
-
+            ds.Tables["tblSV"].RejectChanges();
+            KhoaSV(true);
         }
 
         private void btnThoat_Click(object sender, EventArgs e)
@@ -659,6 +843,58 @@ namespace QuanLyDiemSinhVien
             }
         }
 
-        
+        private void tabSinhVien_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dgvSinhVien_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            
+            if (!btnThem.Enabled || !btnSua.Enabled) return;
+
+            if (e.RowIndex < 0 || e.RowIndex >= dgvSinhVien.RowCount) return; 
+
+            DataGridViewRow row = dgvSinhVien.Rows[e.RowIndex];
+
+            
+            txtMaSV.Text = row.Cells["MaSV"].Value.ToString();
+            txtHoTen.Text = row.Cells["HoTen"].Value.ToString();
+
+            
+            if (row.Cells["NgaySinh"].Value != DBNull.Value && row.Cells["NgaySinh"].Value != null)
+            {
+                
+                dtpNgaySinh.Value = Convert.ToDateTime(row.Cells["NgaySinh"].Value);
+            }
+            else
+            {
+                dtpNgaySinh.Value = DateTime.Now; 
+            }
+
+            
+            if (row.Cells["GioiTinh"].Value != DBNull.Value && row.Cells["GioiTinh"].Value != null)
+            {
+                bool gioiTinhNam = Convert.ToBoolean(row.Cells["GioiTinh"].Value); // 1: Nam, 0: Nữ
+                chkNam.Checked = gioiTinhNam;
+                chkNu.Checked = !gioiTinhNam;
+            }
+            else
+            {
+                chkNam.Checked = true; 
+                chkNu.Checked = false;
+            }
+
+            
+            if (row.Cells["MaLop"].Value != DBNull.Value && row.Cells["MaLop"].Value != null)
+            {
+                cbLop.SelectedValue = row.Cells["MaLop"].Value;
+            }
+            else
+            {
+                cbLop.SelectedIndex = -1;
+            }
+        }
     }
-}
+ }
+
