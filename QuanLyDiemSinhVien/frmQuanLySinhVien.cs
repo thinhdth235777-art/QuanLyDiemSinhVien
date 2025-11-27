@@ -357,12 +357,11 @@ namespace QuanLyDiemSinhVien
         {
             dangThemMH = true;
 
-            cbMaMon1.Text = "";
-            cbMonHoc1.Text = "";
-            cbSTC.Text = "";
+            cbMaMon1.SelectedIndex = -1;
+            cbMonHoc1.SelectedIndex=-1;
+            cbSTC.SelectedIndex = -1;
 
             KhoaMonHoc(false);
-            cbMaMon1.Focus();
         }
 
         private void btnSua1_Click(object sender, EventArgs e)
@@ -401,7 +400,8 @@ namespace QuanLyDiemSinhVien
             }
 
             DialogResult traloi = MessageBox.Show("Bạn có chắc muốn xóa môn học này?","Xác nhận",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
-            if (traloi == DialogResult.No) return;
+            if (traloi == DialogResult.No) 
+                return;
             try
             {
                 int r = dgvMonHoc.CurrentCell.RowIndex;
@@ -1248,8 +1248,6 @@ namespace QuanLyDiemSinhVien
                 cbLop.SelectedIndex = -1;
             }
         }
-
-        
     }
  }
 
