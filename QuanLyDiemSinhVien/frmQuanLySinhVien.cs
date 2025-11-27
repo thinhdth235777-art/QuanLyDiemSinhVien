@@ -352,27 +352,131 @@ namespace QuanLyDiemSinhVien
 
         private void btnThem1_Click(object sender, EventArgs e)
         {
+            dangThemMH = true;
 
+            cbMaMon1.Text = "";
+            cbMonHoc1.Text = "";
+            cbSTC.Text = "";
+
+            KhoaMonHoc(false);
+            cbMaMon1.Focus();
         }
 
         private void btnSua1_Click(object sender, EventArgs e)
         {
+            if (dgvMonHoc.CurrentRow == null)
+            {
+                MessageBox.Show("Vui lòng chọn dòng cần sửa!");
+                return;
+            }
 
+            dangThemMH = false;
+            KhoaMonHoc(false);
+            cbMaMon1.Enabled = false; // Không cho sửa Mã Môn khi sửa
+            cbMonHoc1.Focus();
         }
 
         private void btnXoa1_Click(object sender, EventArgs e)
         {
+            if (dgvMonHoc.CurrentRow == null)
+            {
+                MessageBox.Show("Vui lòng chọn dòng cần xóa!");
+                return;
+            }
 
+            string maMonCanXoa = dgvMonHoc.CurrentRow.Cells["MaMon"].Value.ToString();
+
+            // Kiểm tra ràng buộc ngoại (giả sử bảng tblDiem đã được load)
+            if (ds.Tables.Contains("tblDiem"))
+            {
+                DataRow[] diemRows = ds.Tables["tblDiem"].Select($"MaMon = '{maMonCanXoa}'");
+                if (diemRows.Length > 0)
+                {
+                    MessageBox.Show("Không thể xóa môn học này vì đang có điểm số. Vui lòng xóa điểm trước!");
+                    return;
+                }
+            }
+
+            DialogResult traloi = MessageBox.Show("Bạn có chắc muốn xóa môn học này?","Xác nhận",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
+            if (traloi == DialogResult.No) return;
+            try
+            {
+                int r = dgvMonHoc.CurrentCell.RowIndex;
+                DataRow dr = ds.Tables["tblMon"].Rows[r];
+                dr.Delete();
+
+                daMon.Update(ds, "tblMon");
+                MessageBox.Show("Đã xóa thành công!");
+                LoadMonHoc(); // Tải lại môn học sau khi xóa
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi xóa dữ liệu: " + ex.Message);
+                ds.Tables["tblMon"].RejectChanges();
+            }
         }
 
         private void btnLuu1_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(cbMaMon1.Text) || string.IsNullOrWhiteSpace(cbMonHoc1.Text) || string.IsNullOrWhiteSpace(cbSTC.Text))
+            {
+                MessageBox.Show("Vui lòng nhập đầy đủ Mã Môn, Tên Môn và Số Tín Chỉ!");
+                return;
+            }
 
+            if (!int.TryParse(cbSTC.Text, out int soTinChi) || soTinChi <= 0)
+            {
+                MessageBox.Show("Số Tín Chỉ phải là số nguyên dương!");
+                return;
+            }
+
+            try
+            {
+                if (dangThemMH)
+                {
+                    // Kiểm tra trùng MaMon
+                    DataRow[] timMon = ds.Tables["tblMon"].Select($"MaMon = '{cbMaMon1.Text.Trim()}'");
+                    if (timMon.Length > 0)
+                    {
+                        MessageBox.Show("Mã Môn đã tồn tại!");
+                        cbMaMon1.Focus();
+                        return;
+                    }
+
+                    // Thêm dòng mới
+                    DataRow dong = ds.Tables["tblMon"].NewRow();
+                    dong["MaMon"] = cbMaMon1.Text.Trim();
+                    dong["TenMon"] = cbMonHoc1.Text.Trim();
+                    dong["SoTinChi"] = soTinChi;
+
+                    ds.Tables["tblMon"].Rows.Add(dong);
+                }
+                else // Chỉnh sửa
+                {
+                    int r = dgvMonHoc.CurrentCell.RowIndex;
+                    DataRow dr = ds.Tables["tblMon"].Rows[r];
+
+                    dr["TenMon"] = cbMonHoc1.Text.Trim();
+                    dr["SoTinChi"] = soTinChi;
+                }
+
+                daMon.Update(ds, "tblMon");
+
+                KhoaMonHoc(true);
+                MessageBox.Show("Đã lưu thành công!");
+                LoadMonHoc(); // Tải lại môn học sau khi lưu
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi lưu dữ liệu: " + ex.Message);
+                ds.Tables["tblMon"].RejectChanges();
+            }
         }
 
         private void btnHuy1_Click(object sender, EventArgs e)
         {
-
+            ds.Tables["tblMon"].RejectChanges();
+            KhoaMonHoc(true);
         }
 
         private void btnThoat1_Click(object sender, EventArgs e)
@@ -386,7 +490,23 @@ namespace QuanLyDiemSinhVien
 
         private void btnTim1_Click(object sender, EventArgs e)
         {
+            string tuKhoa = cbMonHoc1.Text.Trim(); // Dùng cbMonHoc1 làm ô tìm kiếm tạm
 
+            if (string.IsNullOrWhiteSpace(tuKhoa))
+            {
+                dgvMonHoc.DataSource = ds.Tables["tblMon"]; // Hiển thị lại toàn bộ
+                return;
+            }
+
+            DataTable dt = ds.Tables["tblMon"];
+
+            string boLoc =
+                $"MaMon LIKE '%{tuKhoa}%' OR TenMon LIKE '%{tuKhoa}%'";
+
+            DataView dv = new DataView(dt);
+            dv.RowFilter = boLoc;
+
+            dgvMonHoc.DataSource = dv;
         }
 
         //=========================================Lớp Học====================================================
@@ -927,7 +1047,26 @@ namespace QuanLyDiemSinhVien
 
         private void btnTim4_Click(object sender, EventArgs e)
         {
+            string tuKhoa = txtTim4.Text.Trim();
 
+            LoadTraCuuData(); // Tải lại data gốc
+
+            DataTable dt = ds.Tables["tblTraCuu"];
+
+            if (string.IsNullOrWhiteSpace(tuKhoa))
+            {
+                dgvTraCuu.DataSource = dt; // Hiển thị lại toàn bộ
+                return;
+            }
+
+            // Lọc trên các cột quan trọng
+            string boLoc =
+                $"MaSV LIKE '%{tuKhoa}%' OR HoTen LIKE '%{tuKhoa}%' OR TenLop LIKE '%{tuKhoa}%' OR TenMon LIKE '%{tuKhoa}%'";
+
+            DataView dv = new DataView(dt);
+            dv.RowFilter = boLoc;
+
+            dgvTraCuu.DataSource = dv;
         }
 
         private void tabQLSinhVien_SelectedIndexChanged(object sender, EventArgs e)
