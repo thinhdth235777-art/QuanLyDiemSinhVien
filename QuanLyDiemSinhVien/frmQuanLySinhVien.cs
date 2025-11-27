@@ -39,13 +39,13 @@ namespace QuanLyDiemSinhVien
         {
             conn.ConnectionString = @"Data Source=.;Initial Catalog=QuanlyDSV;Integrated Security=True";
             //=========================Xử lý load Sinh Viên=========================================
-            LoadSinhVien();
             //=========================Xử lý load Môn Học===========================================
             //...
             //=========================Xử lý load Lớp Học===========================================
             LoadComboLop();
             LoadComboMon();
             LoadDanhSachLop();
+            LoadSinhVien();
             KhoaLopHoc(true);
             //=========================Xử lý load Nhập Điểm=========================================
             LoadComboLop_NhapDiem();
@@ -200,7 +200,7 @@ namespace QuanLyDiemSinhVien
                 dr.Delete();
 
                 daSV.Update(ds, "tblSV");
-                LoadDiemData();
+                //LoadDiemData();
                 MessageBox.Show("Đã xóa thành công!");
             }
             catch (Exception ex)
@@ -211,7 +211,7 @@ namespace QuanLyDiemSinhVien
         }
         private void btnLuu_Click(object sender, EventArgs e)
         {
-            if (txtMaSV.Text.Trim() == "" || txtHoTen.Text.Trim() == "" || cbLopSV.SelectedIndex == -1)
+            if (txtMaSV.Text.Trim() == "" || txtHoTen.Text.Trim() == "" || cbLop.SelectedIndex == -1)
             {
                 MessageBox.Show("Vui lòng nhập đầy đủ Mã SV, Họ Tên và chọn Lớp!");
                 return;
@@ -322,7 +322,7 @@ namespace QuanLyDiemSinhVien
         {
             string sqlMon = "SELECT MaMon, TenMon, SoTinChi FROM MonHoc";
             daMon = new SqlDataAdapter(sqlMon, conn);
-            cbMonHoc1 = new SqlCommandBuilder(daMon);
+            SqlCommandBuilder cbMonHoc1 = new SqlCommandBuilder(daMon);
             try
             {
                 if (ds.Tables.Contains("tblMon"))
