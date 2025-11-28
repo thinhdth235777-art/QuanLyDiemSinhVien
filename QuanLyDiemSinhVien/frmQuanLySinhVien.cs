@@ -24,7 +24,8 @@ namespace QuanLyDiemSinhVien
         SqlDataAdapter daSV;
         SqlCommandBuilder cmbSV;
         SqlCommandBuilder cbMonhoc1;
-        
+        SqlDataAdapter daDiemThuan;
+
 
         bool dangThemSV = false;
         bool dangThemMH = false;
@@ -51,8 +52,10 @@ namespace QuanLyDiemSinhVien
             LoadComboLop_NhapDiem();
             LoadComboMon_NhapDiem();
             LoadNhapDiem();
-            LoadBangDiem();
+            //LoadBangDiem();
             KhoaNhapDiem(true);
+            txtDiemGK1.TextChanged += (s, e2) => TinhDiem();
+            txtDiemCK1.TextChanged += (s, e2) => TinhDiem();
         }
 
         //==========================================Sinh Viên================================================
@@ -538,13 +541,20 @@ namespace QuanLyDiemSinhVien
         }
         private void LoadComboMon()
         {
-            string sql = "SELECT * FROM MonHoc";
-            daMon = new SqlDataAdapter(sql, conn);
-            daMon.Fill(ds, "tblMon");
+            string sql = "SELECT MaMon, TenMon FROM MonHoc";
+            SqlDataAdapter da = new SqlDataAdapter(sql, conn);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
 
-            cbMonHoc2.DataSource = ds.Tables["tblMon"];
-            cbMonHoc2.DisplayMember = "TenMon";
-            cbMonHoc2.ValueMember = "MaMon";
+            // COMBOBOX MÃ MÔN
+            cbMaMon2.DataSource = dt;
+            cbMaMon2.DisplayMember = "MaMon";
+            cbMaMon2.ValueMember = "MaMon";
+
+            // COMBOBOX TÊN MÔN — PHẢI COPY DATATABLE
+            cbMonHoc3.DataSource = dt.Copy();
+            cbMonHoc3.DisplayMember = "TenMon";
+            cbMonHoc3.ValueMember = "MaMon";
         }
         private void LoadDanhSachLop()
         {
@@ -593,9 +603,7 @@ namespace QuanLyDiemSinhVien
             }
 
             DialogResult traloi = MessageBox.Show(
-                "Bạn có chắc muốn xóa lớp học này?",
-                "Xác nhận",
-                MessageBoxButtons.YesNo,
+                "Bạn có chắc muốn xóa lớp học này?", "Xác nhận", MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
 
             if (traloi == DialogResult.No) return;
@@ -679,9 +687,27 @@ namespace QuanLyDiemSinhVien
         }
         //===========================================Nhập Điểm=================================================
         //CHỖ VIẾT THÊM HÀM MỚI CỦA NHẬP ĐIỂM:
+        bool _khoaDongBoMon = false;
         bool dangThemDiem = false;
+        bool _khoaLop = false;
         SqlDataAdapter daDiem;
 
+        private void TinhDiem()
+        {
+            if (double.TryParse(txtDiemGK1.Text, out double gk) &&
+                double.TryParse(txtDiemCK1.Text, out double ck))
+            {
+                double tb = Math.Round((gk + ck * 2) / 3, 2);
+                txtDiemTB1.Text = tb.ToString();
+
+                txtKetQua1.Text = tb >= 5 ? "Đậu" : "Rớt";
+            }
+            else
+            {
+                txtDiemTB1.Text = "";
+                txtKetQua1.Text = "";
+            }
+        }
         private void LoadComboLop_NhapDiem()
         {
             string sql = "SELECT MaLop, TenLop FROM Lop";
@@ -695,7 +721,38 @@ namespace QuanLyDiemSinhVien
             cbLop2.SelectedIndex = -1;
         }
 
+        private void CbMaMon2_Changed(object sender, EventArgs e)
+        {
+            if (_khoaDongBoMon) return;
 
+            try
+            {
+                _khoaDongBoMon = true;
+                if (cbMaMon2.SelectedValue != null)
+                    cbMonHoc3.SelectedValue = cbMaMon2.SelectedValue;
+            }
+            finally
+            {
+                _khoaDongBoMon = false;
+            }
+        }
+
+        // Khi chọn Tên môn → tự đồng bộ sang Mã môn
+        private void CbMonHoc3_Changed(object sender, EventArgs e)
+        {
+            if (_khoaDongBoMon) return;
+
+            try
+            {
+                _khoaDongBoMon = true;
+                if (cbMonHoc3.SelectedValue != null)
+                    cbMaMon2.SelectedValue = cbMonHoc3.SelectedValue;
+            }
+            finally
+            {
+                _khoaDongBoMon = false;
+            }
+        }
         private void LoadComboMon_NhapDiem()
         {
             string sql = "SELECT MaMon, TenMon FROM MonHoc";
@@ -703,23 +760,22 @@ namespace QuanLyDiemSinhVien
             DataTable dt = new DataTable();
             da.Fill(dt);
 
+            // ----- COMBOBOX MÃ MÔN -----
             cbMaMon2.DataSource = dt;
-            cbMaMon2.DisplayMember = "MaMon";
+            cbMaMon2.DisplayMember = "MaMon";   // <<< BẮT BUỘC
             cbMaMon2.ValueMember = "MaMon";
 
+            // ----- COMBOBOX TÊN MÔN -----
             cbMonHoc3.DataSource = dt.Copy();
-            cbMonHoc3.DisplayMember = "TenMon";
+            cbMonHoc3.DisplayMember = "TenMon"; // <<< BẮT BUỘC
             cbMonHoc3.ValueMember = "MaMon";
 
-            // đồng bộ hai combobox
-            cbMaMon2.SelectedIndexChanged += (s, e) => {
-                if (cbMaMon2.SelectedValue != null)
-                    cbMonHoc3.SelectedValue = cbMaMon2.SelectedValue;
-            };
-            cbMonHoc3.SelectedIndexChanged += (s, e) => {
-                if (cbMonHoc3.SelectedValue != null)
-                    cbMaMon2.SelectedValue = cbMonHoc3.SelectedValue;
-            };
+            // ----- ĐỒNG BỘ 2 COMBOBOX -----
+            cbMaMon2.SelectedValueChanged -= CbMaMon2_Changed;
+            cbMonHoc3.SelectedValueChanged -= CbMonHoc3_Changed;
+
+            cbMaMon2.SelectedValueChanged += CbMaMon2_Changed;
+            cbMonHoc3.SelectedValueChanged += CbMonHoc3_Changed;
         }
         private void LoadNhapDiem()
         {
@@ -730,56 +786,46 @@ namespace QuanLyDiemSinhVien
 
             daMon.Fill(ds, "tblMonHoc");
 
-            cbMaMon2.DataSource = ds.Tables["tblMonHoc"];
-            cbMaMon2.DisplayMember = "TenMon";
-            cbMaMon2.ValueMember = "MaMon";
-
 
             string sql = @"
-        SELECT d.MaSV, sv.HoTen, sv.MaLop, d.MaMon, mh.TenMon,
-               d.DiemGK, d.DiemCK,
-               ROUND((d.DiemGK + d.DiemCK * 2) / 3, 2) AS DiemTB
-        FROM Diem d
-        JOIN SinhVien sv ON d.MaSV = sv.MaSV
-        JOIN MonHoc mh ON d.MaMon = mh.MaMon";
+            SELECT d.MaSV, sv.HoTen, sv.MaLop, d.MaMon, mh.TenMon,
+            d.DiemGK, d.DiemCK,
+            ROUND((d.DiemGK + d.DiemCK * 2) / 3, 2) AS DiemTB,
+            CASE 
+            WHEN ROUND((d.DiemGK + d.DiemCK * 2) / 3, 2) >= 5 THEN N'Đậu'
+            ELSE N'Rớt'
+            END AS KetQua
+            FROM Diem d
+            JOIN SinhVien sv ON d.MaSV = sv.MaSV
+            JOIN MonHoc mh ON d.MaMon = mh.MaMon";
 
             daDSLop = new SqlDataAdapter(sql, conn);
 
             if (ds.Tables["tblDiem"] != null)
                 ds.Tables["tblDiem"].Clear();
 
-            daDSLop.Fill(ds, "tblDiem");
+            daDiemThuan = new SqlDataAdapter("SELECT * FROM Diem", conn);
+            SqlCommandBuilder cbDiem = new SqlCommandBuilder(daDiemThuan);
 
-            dgvNhapDiem.DataSource = ds.Tables["tblDiem"];
-        }
+            // Tạo bảng thuần theo đúng cấu trúc SQL
+            if (ds.Tables["DiemThuan"] != null)
+                ds.Tables["DiemThuan"].Clear();
 
-        private void LoadBangDiem()
-        {
-            string sql = @"SELECT d.MaSV, sv.HoTen, sv.MaLop, d.MaMon, m.TenMon,
-                          d.DiemGK, d.DiemCK, d.DiemTB
-                   FROM Diem d
-                   JOIN SinhVien sv ON d.MaSV = sv.MaSV
-                   JOIN MonHoc m ON d.MaMon = m.MaMon";
+            daDiemThuan.Fill(ds, "DiemThuan");
 
-            SqlDataAdapter da = new SqlDataAdapter(sql, conn);
-            DataTable dt = new DataTable();
-            da.Fill(dt);
-            dt.Columns.Add("KetQua", typeof(string));
-
-            foreach (DataRow row in dt.Rows)
+            // Cài Primary Key CHO BẢNG TRONG BỘ NHỚ
+            ds.Tables["DiemThuan"].PrimaryKey = new DataColumn[]
             {
-                double tb = Convert.ToDouble(row["DiemTB"]);
-                row["KetQua"] = (tb >= 5) ? "Đậu" : "Rớt";
-            }
+    ds.Tables["DiemThuan"].Columns["MaSV"],
+    ds.Tables["DiemThuan"].Columns["MaMon"]
+            };
 
 
-            dgvNhapDiem.DataSource = dt;
+            daDSLop.Fill(ds, "tblDiem");
+            // ===== ĐỊNH DẠNG BẢNG =====
             dgvNhapDiem.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgvNhapDiem.Columns["HoTen"].FillWeight = 200;
-            dgvNhapDiem.Columns["TenMon"].FillWeight = 150;
             dgvNhapDiem.AllowUserToAddRows = false;
 
-            // đặt header tiếng Việt (nếu cột tồn tại)
             if (dgvNhapDiem.Columns.Contains("MaSV")) dgvNhapDiem.Columns["MaSV"].HeaderText = "Mã SV";
             if (dgvNhapDiem.Columns.Contains("HoTen")) dgvNhapDiem.Columns["HoTen"].HeaderText = "Họ Tên";
             if (dgvNhapDiem.Columns.Contains("MaLop")) dgvNhapDiem.Columns["MaLop"].HeaderText = "Lớp";
@@ -789,18 +835,28 @@ namespace QuanLyDiemSinhVien
             if (dgvNhapDiem.Columns.Contains("DiemCK")) dgvNhapDiem.Columns["DiemCK"].HeaderText = "Cuối kỳ";
             if (dgvNhapDiem.Columns.Contains("DiemTB")) dgvNhapDiem.Columns["DiemTB"].HeaderText = "Trung bình";
             if (dgvNhapDiem.Columns.Contains("KetQua")) dgvNhapDiem.Columns["KetQua"].HeaderText = "Kết quả";
+
+            // chỉnh độ rộng cột (tuỳ ý)
+            dgvNhapDiem.Columns["HoTen"].FillWeight = 180;
+            dgvNhapDiem.Columns["TenMon"].FillWeight = 150;
+
+            dgvNhapDiem.DataSource = ds.Tables["tblDiem"];
         }
         private void cbLop2_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (_khoaLop) return;   // KHÔNG chạy khi đang Thêm
             if (cbLop2.SelectedValue == null) return;
+
             string malop = cbLop2.SelectedValue.ToString();
 
-            string sql = @"SELECT d.MaSV, sv.HoTen, sv.MaLop, d.MaMon, m.TenMon,
-                          d.DiemGK, d.DiemCK, d.DiemTB
-                   FROM Diem d
-                   JOIN SinhVien sv ON d.MaSV = sv.MaSV
-                   JOIN MonHoc m ON d.MaMon = m.MaMon
-                   WHERE sv.MaLop = @MaLop";
+            string sql = @"
+        SELECT d.MaSV, sv.HoTen, sv.MaLop, d.MaMon, m.TenMon,
+               d.DiemGK, d.DiemCK, d.DiemTB,
+               CASE WHEN ROUND((d.DiemGK + d.DiemCK * 2)/3,2) >=5 THEN N'Đậu' ELSE N'Rớt' END AS KetQua
+        FROM Diem d
+        JOIN SinhVien sv ON d.MaSV = sv.MaSV
+        JOIN MonHoc m ON d.MaMon = m.MaMon
+        WHERE sv.MaLop = @MaLop";
 
             SqlDataAdapter da = new SqlDataAdapter(sql, conn);
             da.SelectCommand.Parameters.AddWithValue("@MaLop", malop);
@@ -809,6 +865,12 @@ namespace QuanLyDiemSinhVien
             da.Fill(dt);
 
             dgvNhapDiem.DataSource = dt;
+
+            // giữ format cột giống LoadNhapDiem()
+            dgvNhapDiem.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvNhapDiem.AllowUserToAddRows = false;
+            if (dgvNhapDiem.Columns.Contains("HoTen")) dgvNhapDiem.Columns["HoTen"].FillWeight = 180;
+            if (dgvNhapDiem.Columns.Contains("TenMon")) dgvNhapDiem.Columns["TenMon"].FillWeight = 150;
         }
         private void KhoaNhapDiem(bool daKhoa)
         {
@@ -861,9 +923,10 @@ namespace QuanLyDiemSinhVien
         private void btnThem3_Click(object sender, EventArgs e)
         {
             dangThemDiem = true;
+
             XoaNhapDiem();
             KhoaNhapDiem(false);
-            LoadNhapDiem();
+            txtHoTen1.Enabled = false;
             txtMaSV1.Focus();
         }
 
@@ -871,7 +934,7 @@ namespace QuanLyDiemSinhVien
         {
             if (dgvNhapDiem.CurrentRow == null)
             {
-                MessageBox.Show("Vui lòng chọn dòng cần sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Vui lòng chọn dòng cần sửa!");
                 return;
             }
 
@@ -879,22 +942,15 @@ namespace QuanLyDiemSinhVien
 
             KhoaNhapDiem(false);
 
-            // Không cho sửa mã sinh viên và họ tên
+            // Không cho sửa mã SV & họ tên
             txtMaSV1.Enabled = false;
             txtHoTen1.Enabled = false;
-
-            // Cho sửa điểm và môn học
-            txtDiemGK1.Enabled = true;
-            txtDiemCK1.Enabled = true;
-            cbMaMon2.Enabled = true;
-            cbMonHoc3.Enabled = true;
-            LoadNhapDiem();
         }
 
         private void btnXoa3_Click(object sender, EventArgs e)
         {
-            string maSV = txtMaSV1.Text;
-            string maMon = cbMaMon2.Text;
+            string maSV = txtMaSV1.Text.Trim();
+            string maMon = cbMaMon2.SelectedValue?.ToString() ?? cbMaMon2.Text;
 
             DialogResult d = MessageBox.Show(
                 $"Bạn có chắc muốn xóa điểm?\n\nMã SV: {maSV}\nMã Môn: {maMon}",
@@ -909,6 +965,17 @@ namespace QuanLyDiemSinhVien
 
             try
             {
+                // đảm bảo conn != null
+                if (conn == null)
+                {
+                    MessageBox.Show("Kết nối chưa được khởi tạo.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // mở connection nếu đang đóng
+                if (conn.State != ConnectionState.Open)
+                    conn.Open();
+
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@maSV", maSV);
@@ -921,7 +988,7 @@ namespace QuanLyDiemSinhVien
                         MessageBox.Show("Xóa điểm thành công!", "Thông báo",
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                        LoadBangDiem();
+                        // reset giao diện
                         XoaNhapDiem();
                     }
                     else
@@ -933,72 +1000,61 @@ namespace QuanLyDiemSinhVien
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi: " + ex.Message);
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (conn != null && conn.State == ConnectionState.Open)
+                    conn.Close();
+            }
+
             LoadNhapDiem();
+            dgvNhapDiem.ClearSelection();
         }
 
         private void btnLuu3_Click(object sender, EventArgs e)
         {
-            // ===== KIỂM TRA ĐẦU VÀO =====
-            if (cbLop2.SelectedIndex == -1 ||
-                string.IsNullOrWhiteSpace(txtMaSV1.Text) ||
-                cbMaMon2.SelectedIndex == -1)
+            string maSV = txtMaSV1.Text.Trim();
+            string maMon = cbMaMon2.SelectedValue.ToString();
+            double gk = double.Parse(txtDiemGK1.Text);
+            double ck = double.Parse(txtDiemCK1.Text);
+
+            DataTable dt = ds.Tables["DiemThuan"];
+            DataRow row = dt.Rows.Find(new object[] { maSV, maMon });
+
+            if (dangThemDiem)
             {
-                MessageBox.Show("Vui lòng chọn đầy đủ Lớp - Sinh viên - Môn học!");
-                return;
-            }
+                if (row != null)
+                {
+                    MessageBox.Show("Điểm đã tồn tại!");
+                    return;
+                }
 
-            // kiểm tra điểm nhập có hợp lệ không
-            if (!double.TryParse(txtDiemGK1.Text, out double gk) ||
-                !double.TryParse(txtDiemCK1.Text, out double ck))
-            {
-                MessageBox.Show("Điểm phải là số!");
-                return;
-            }
-
-            if (gk < 0 || gk > 10 || ck < 0 || ck > 10)
-            {
-                MessageBox.Show("Điểm phải nằm trong khoảng 0 - 10!");
-                return;
-            }
-
-            // ===== TÍNH ĐIỂM TB =====
-            double tb = Math.Round((gk + ck * 2) / 3, 2);
-            string ketQua = tb >= 5 ? "Đậu" : "Rớt";
-
-            if (dangThem)
-            {
-                // ===== THÊM MỚI =====
-                DataRow dong = ds.Tables["tblDiem"].NewRow();
-
-                dong["MaSV"] = txtMaSV1.Text;
-                dong["MaMon"] = cbMaMon2.SelectedValue;
-                dong["DiemGK"] = gk;
-                dong["DiemCK"] = ck;
-                dong["DiemTB"] = tb;
-                dong["KetQua"] = ketQua;
-
-                ds.Tables["tblDiem"].Rows.Add(dong);
+                row = dt.NewRow();
+                row["MaSV"] = maSV;
+                row["MaMon"] = maMon;
+                row["DiemGK"] = gk;
+                row["DiemCK"] = ck;
+                dt.Rows.Add(row);
             }
             else
             {
-                // ===== SỬA =====
-                int r = dgvNhapDiem.CurrentCell.RowIndex;
+                if (row == null)
+                {
+                    MessageBox.Show("Không tìm thấy dữ liệu để cập nhật!");
+                    return;
+                }
 
-                ds.Tables["tblDiem"].Rows[r]["MaSV"] = txtMaSV1.Text;
-                ds.Tables["tblDiem"].Rows[r]["MaMon"] = cbMaMon2.SelectedValue;
-                ds.Tables["tblDiem"].Rows[r]["DiemGK"] = gk;
-                ds.Tables["tblDiem"].Rows[r]["DiemCK"] = ck;
-                ds.Tables["tblDiem"].Rows[r]["DiemTB"] = tb;
-                ds.Tables["tblDiem"].Rows[r]["KetQua"] = ketQua;
+                row["DiemGK"] = gk;
+                row["DiemCK"] = ck;
             }
 
-            // ===== KHÓA LẠI GIAO DIỆN =====
-            KhoaNhapDiem(true);
+            // === LƯU THỰC TẾ VÀO SQL ===
+            daDiemThuan.Update(dt);
 
-            // ===== LOAD LẠI BẢNG =====
-            LoadBangDiem();
+            MessageBox.Show("Lưu thành công!");
+            LoadNhapDiem();
+            KhoaNhapDiem(true);
         }
 
         private void btnHuy3_Click(object sender, EventArgs e)
@@ -1017,11 +1073,74 @@ namespace QuanLyDiemSinhVien
 
         private void btnTim3_Click(object sender, EventArgs e)
         {
+            string tuKhoa = txtTim3.Text.Trim();
 
+            // nếu không nhập, load lại toàn bộ bảng
+            if (string.IsNullOrEmpty(tuKhoa))
+            {
+                return;
+            }
+
+            try
+            {
+                string sql = @"
+            SELECT d.MaSV, sv.HoTen, sv.MaLop, d.MaMon, mh.TenMon,
+                   d.DiemGK, d.DiemCK, d.DiemTB
+            FROM Diem d
+            JOIN SinhVien sv ON d.MaSV = sv.MaSV
+            JOIN MonHoc mh ON d.MaMon = mh.MaMon
+            WHERE sv.MaLop LIKE @kw
+               OR d.MaSV   LIKE @kw
+               OR sv.HoTen LIKE @kw
+               OR d.MaMon  LIKE @kw
+               OR mh.TenMon LIKE @kw
+        ";
+
+                using (SqlDataAdapter da = new SqlDataAdapter(sql, conn))
+                {
+                    da.SelectCommand.Parameters.AddWithValue("@kw", "%" + tuKhoa + "%");
+
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    dgvNhapDiem.DataSource = dt;
+
+                    if (dt.Rows.Count == 0)
+                        MessageBox.Show("Không tìm thấy kết quả.", "Kết quả", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
-        private void btnCapNhat_Click(object sender, EventArgs e)
+        private void dgvNhapDiem_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
-            LoadNhapDiem();
+            if (dgvNhapDiem.Columns[e.ColumnIndex].Name == "KetQua")
+            {
+                if (e.Value != null)
+                {
+                    string kq = e.Value.ToString().Trim();
+
+                    if (kq == "Đậu")
+                    {
+                        e.CellStyle.ForeColor = ColorTranslator.FromHtml("#33FF66");
+                    }
+                    else if (kq == "Rớt")
+                    {
+                        e.CellStyle.ForeColor = Color.Red;
+                    }
+                }
+            }
+        }
+        private void txtDiemGK1_TextChanged(object sender, EventArgs e)
+        {
+            TinhDiem();
+        }
+
+        private void txtDiemCK1_TextChanged(object sender, EventArgs e)
+        {
+            TinhDiem();
         }
         //============================================Tra Cứu================================================
         //CHỖ VIẾT THÊM HÀM MỚI CỦA TRA CỨU:
@@ -1129,6 +1248,8 @@ namespace QuanLyDiemSinhVien
                 cbLop.SelectedIndex = -1;
             }
         }
+
+        
     }
  }
 
