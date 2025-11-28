@@ -357,12 +357,11 @@ namespace QuanLyDiemSinhVien
         {
             dangThemMH = true;
 
-            cbMaMon1.Text = "";
-            cbMonHoc1.Text = "";
-            cbSTC.Text = "";
+            cbMaMon1.SelectedIndex = -1;
+            cbMonHoc1.SelectedIndex=-1;
+            cbSTC.SelectedIndex = -1;
 
             KhoaMonHoc(false);
-            cbMaMon1.Focus();
         }
 
         private void btnSua1_Click(object sender, EventArgs e)
@@ -401,7 +400,8 @@ namespace QuanLyDiemSinhVien
             }
 
             DialogResult traloi = MessageBox.Show("Bạn có chắc muốn xóa môn học này?","Xác nhận",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
-            if (traloi == DialogResult.No) return;
+            if (traloi == DialogResult.No) 
+                return;
             try
             {
                 int r = dgvMonHoc.CurrentCell.RowIndex;
@@ -687,6 +687,20 @@ namespace QuanLyDiemSinhVien
             dv.RowFilter = boLoc;
 
             dgvLopHoc.DataSource = dv;
+        }
+        private void dgvLopHoc_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return; // tránh click tiêu đề
+
+            DataGridViewRow row = dgvLopHoc.Rows[e.RowIndex];
+
+            // --- Đổ dữ liệu xuống các ô nhập ---
+            cbLop1.Text = row.Cells["TenLop"].Value.ToString();
+            cbMonHoc2.Text = row.Cells["TenMon"].Value.ToString();
+            txtSiSo.Text = row.Cells["SiSo"].Value.ToString();
+
+            // --- Mở khóa nút Sửa / Xóa ---
+            KhoaLopHoc(true);
         }
         //===========================================Nhập Điểm=================================================
         //CHỖ VIẾT THÊM HÀM MỚI CỦA NHẬP ĐIỂM:
@@ -1251,20 +1265,7 @@ namespace QuanLyDiemSinhVien
             }
         }
 
-        private void dgvLopHoc_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex < 0) return; // tránh click tiêu đề
-
-            DataGridViewRow row = dgvLopHoc.Rows[e.RowIndex];
-
-            // --- Đổ dữ liệu xuống các ô nhập ---
-            cbLop1.Text = row.Cells["TenLop"].Value.ToString();
-            cbMonHoc2.Text = row.Cells["TenMon"].Value.ToString();
-            txtSiSo.Text = row.Cells["SiSo"].Value.ToString();
-
-            // --- Mở khóa nút Sửa / Xóa ---
-            KhoaLopHoc(true);
-        }
+        
     }
  }
 
