@@ -569,6 +569,11 @@ namespace QuanLyDiemSinhVien
             dgvLopHoc.Columns["TenLop"].HeaderText = "Tên Lớp";
             dgvLopHoc.Columns["TenMon"].HeaderText = "Môn Học";
             dgvLopHoc.Columns["SiSo"].HeaderText = "Sĩ Số";
+
+            dgvLopHoc.Columns["TenLop"].FillWeight = 170;
+            dgvLopHoc.Columns["TenMon"].FillWeight = 150;
+
+
         }
         private void btnThem2_Click(object sender, EventArgs e)
         {
@@ -602,9 +607,7 @@ namespace QuanLyDiemSinhVien
                 return;
             }
 
-            DialogResult traloi = MessageBox.Show(
-                "Bạn có chắc muốn xóa lớp học này?", "Xác nhận", MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
+            DialogResult traloi = MessageBox.Show("Bạn có chắc muốn xóa lớp học này?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (traloi == DialogResult.No) return;
 
@@ -762,12 +765,12 @@ namespace QuanLyDiemSinhVien
 
             // ----- COMBOBOX MÃ MÔN -----
             cbMaMon2.DataSource = dt;
-            cbMaMon2.DisplayMember = "MaMon";   // <<< BẮT BUỘC
+            cbMaMon2.DisplayMember = "MaMon";
             cbMaMon2.ValueMember = "MaMon";
 
             // ----- COMBOBOX TÊN MÔN -----
             cbMonHoc3.DataSource = dt.Copy();
-            cbMonHoc3.DisplayMember = "TenMon"; // <<< BẮT BUỘC
+            cbMonHoc3.DisplayMember = "TenMon";
             cbMonHoc3.ValueMember = "MaMon";
 
             // ----- ĐỒNG BỘ 2 COMBOBOX -----
@@ -836,8 +839,7 @@ namespace QuanLyDiemSinhVien
             if (dgvNhapDiem.Columns.Contains("DiemTB")) dgvNhapDiem.Columns["DiemTB"].HeaderText = "Trung bình";
             if (dgvNhapDiem.Columns.Contains("KetQua")) dgvNhapDiem.Columns["KetQua"].HeaderText = "Kết quả";
 
-            // chỉnh độ rộng cột (tuỳ ý)
-            dgvNhapDiem.Columns["HoTen"].FillWeight = 180;
+            dgvNhapDiem.Columns["HoTen"].FillWeight = 220;
             dgvNhapDiem.Columns["TenMon"].FillWeight = 150;
 
             dgvNhapDiem.DataSource = ds.Tables["tblDiem"];
@@ -869,7 +871,7 @@ namespace QuanLyDiemSinhVien
             // giữ format cột giống LoadNhapDiem()
             dgvNhapDiem.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvNhapDiem.AllowUserToAddRows = false;
-            if (dgvNhapDiem.Columns.Contains("HoTen")) dgvNhapDiem.Columns["HoTen"].FillWeight = 180;
+            if (dgvNhapDiem.Columns.Contains("HoTen")) dgvNhapDiem.Columns["HoTen"].FillWeight = 220;
             if (dgvNhapDiem.Columns.Contains("TenMon")) dgvNhapDiem.Columns["TenMon"].FillWeight = 150;
         }
         private void KhoaNhapDiem(bool daKhoa)
@@ -1249,7 +1251,20 @@ namespace QuanLyDiemSinhVien
             }
         }
 
-        
+        private void dgvLopHoc_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return; // tránh click tiêu đề
+
+            DataGridViewRow row = dgvLopHoc.Rows[e.RowIndex];
+
+            // --- Đổ dữ liệu xuống các ô nhập ---
+            cbLop1.Text = row.Cells["TenLop"].Value.ToString();
+            cbMonHoc2.Text = row.Cells["TenMon"].Value.ToString();
+            txtSiSo.Text = row.Cells["SiSo"].Value.ToString();
+
+            // --- Mở khóa nút Sửa / Xóa ---
+            KhoaLopHoc(true);
+        }
     }
  }
 
